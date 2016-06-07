@@ -1,4 +1,4 @@
-# react-library-skeleton
+# react-transition-context
 
 This is my personal skeleton for creating a React library component npm module.  You are welcome to use it.
 
