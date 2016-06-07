@@ -138,11 +138,6 @@ export default class TransitionContext extends Component<void, Props, void> {
     }
   }
 
-  componentDidMount() {
-    const state = this.transitionContext.getState()
-    this.handleTransition('out', state)
-  }
-
   componentWillReceiveProps(nextProps: Props, nextContext: any) {
     const prevTransitionContext = this.context.transitionContext
     const nextTransitionContext = nextContext.transitionContext
@@ -205,6 +200,7 @@ export class TransitionListener extends Component<void, Listener, void> {
       const listener: Object = this
       transitionContext.addListener(listener)
     }
+    this.updateEvents()
   }
   componentWillReceiveProps(nextProps: Listener, nextContext: any) {
     const {prevTransitionContext} = this.context.transitionContext
@@ -215,15 +211,7 @@ export class TransitionListener extends Component<void, Listener, void> {
       if (prevTransitionContext != null) prevTransitionContext.removeListener(listener)
       if (nextTransitionContext != null) nextTransitionContext.addListener(listener)
     }
-    this.onTransition = nextProps.onTransition
-    this.willComeIn = nextProps.willComeIn
-    this.didComeIn = nextProps.didComeIn
-    this.willAppear = nextProps.willAppear
-    this.didAppear = nextProps.didAppear
-    this.willEnter = nextProps.willEnter
-    this.didEnter = nextProps.didEnter
-    this.willLeave = nextProps.willLeave
-    this.didLeave = nextProps.didLeave
+    this.updateEvents(nextProps)
   }
   componentWillUnmount() {
     const {transitionContext} = this.context
@@ -233,6 +221,18 @@ export class TransitionListener extends Component<void, Listener, void> {
       transitionContext.removeListener(listener)
     }
   }
+
+  updateEvents: (props?: Listener) => void = (props = this.props) => {
+    this.onTransition = props.onTransition
+    this.willComeIn = props.willComeIn
+    this.didComeIn = props.didComeIn
+    this.willAppear = props.willAppear
+    this.didAppear = props.didAppear
+    this.willEnter = props.willEnter
+    this.didEnter = props.didEnter
+    this.willLeave = props.willLeave
+    this.didLeave = props.didLeave
+  };
 
   render() {
     return null
