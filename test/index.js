@@ -3,7 +3,42 @@ import TransitionContext, {TransitionListener} from '../src'
 
 import {mount} from 'enzyme'
 
+describe('TransitionListener', () => {
+  describe('by itself', () => {
+    it('calls didComeIn on mount', () => {
+      const didComeIn = jasmine.createSpy('didComeIn')
+
+      mount(
+        <TransitionListener didComeIn={didComeIn} />
+      )
+      expect(didComeIn).toHaveBeenCalled()
+    })
+  })
+})
+
 describe('TransitionContext', () => {
+  describe('by itself', () => {
+    it('calls didComeIn if in during componentDidMount', () => {
+      const didComeIn = jasmine.createSpy('didComeIn')
+
+      mount(
+        <TransitionContext transitionState="in">
+          <TransitionListener didComeIn={didComeIn} />
+        </TransitionContext>
+      )
+      expect(didComeIn).toHaveBeenCalled()
+    })
+    it("doesn't call didComeIn if in during componentDidMount", () => {
+      const didComeIn = jasmine.createSpy('didComeIn')
+
+      mount(
+        <TransitionContext transitionState="appearing">
+          <TransitionListener didComeIn={didComeIn} />
+        </TransitionContext>
+      )
+      expect(didComeIn).not.toHaveBeenCalled()
+    })
+  })
   describe('nested once', () => {
     describe('child out', () => {
       it('fires nothing regardless of parent state', () => {

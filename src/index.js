@@ -138,6 +138,10 @@ export default class TransitionContext extends Component<void, Props, void> {
     }
   }
 
+  componentDidMount() {
+    if (this.transitionContext.getState() === 'in') this.callListeners('didComeIn')
+  }
+
   componentWillReceiveProps(nextProps: Props, nextContext: any) {
     const prevTransitionContext = this.context.transitionContext
     const nextTransitionContext = nextContext.transitionContext
@@ -193,18 +197,25 @@ export class TransitionListener extends Component<void, Listener, void> {
   willLeave: ?Function;
   didLeave: ?Function;
 
-  componentDidMount() {
+  componentWillMount() {
     const {transitionContext} = this.context
+    this.updateEvents()
     if (transitionContext) {
       // flow workaround
       const listener: Object = this
       transitionContext.addListener(listener)
     }
-    this.updateEvents()
+  }
+
+  componentDidMount() {
+    const {transitionContext} = this.context
+    if (!transitionContext || transitionContext.getState() === 'in') {
+      this.didComeIn && this.didComeIn()
+    }
   }
   componentWillReceiveProps(nextProps: Listener, nextContext: any) {
-    const {prevTransitionContext} = this.context.transitionContext
-    const {nextTransitionContext} = nextContext.transitionContext
+    const prevTransitionContext = this.context.transitionContext
+    const nextTransitionContext = nextContext.transitionContext
     if (prevTransitionContext !== nextTransitionContext) {
       // flow workaround
       const listener: Object = this
