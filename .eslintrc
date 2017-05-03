@@ -28,7 +28,7 @@
     "react/jsx-space-before-closing": 2,
     "react/no-unknown-property": 0,
     "react/prop-types": 2,
-    "react/wrap-multilines": 2
+    "react/jsx-wrap-multilines": 2
   },
   "env": {
     "node": true
