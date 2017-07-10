@@ -52,7 +52,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
-    "progress-bar-webpack-plugin": "^1.6.0",
+    "progress-bar-webpack-plugin": "^1.10.0",
     "react": "^15.5.4",
     "react-addons-test-utils": "^15.5.1",
     "react-dom": "^15.5.4",
