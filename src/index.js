@@ -231,6 +231,8 @@ export class TransitionListener extends Component<void, Listener, void> {
       // flow workaround
       const listener: Object = this
       transitionContext.removeListener(listener)
+    } else {
+      this.willLeave && this.willLeave()
     }
   }
 

@@ -13,6 +13,17 @@ describe('TransitionListener', () => {
       )
       expect(didComeIn).toHaveBeenCalled()
     })
+    it('calls willLeave and on unmount', () => {
+      const willLeave = jasmine.createSpy('willLeave')
+
+      const comp = mount(
+        <TransitionListener willLeave={willLeave} />
+      )
+      expect(willLeave).not.toHaveBeenCalled()
+
+      comp.unmount()
+      expect(willLeave).toHaveBeenCalled()
+    })
   })
 })
 
