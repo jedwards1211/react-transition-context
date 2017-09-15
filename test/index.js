@@ -251,6 +251,52 @@ describe('TransitionContext', () => {
         expect(onTransition).toHaveBeenCalledWith('leaving', 'out')
         expect(didLeave).toHaveBeenCalled()
       })
+      it('fires didLeave when child unmounts', () => {
+        const onTransition = jasmine.createSpy('onTransition')
+        const didLeave = jasmine.createSpy('didLeave')
+
+        const comp = mount(
+          <TransitionContext transitionState="in">
+            <TransitionContext transitionState="in">
+              <TransitionListener onTransition={onTransition} didLeave={didLeave} />
+            </TransitionContext>
+          </TransitionContext>
+        )
+
+        expect(onTransition).not.toHaveBeenCalled()
+        expect(didLeave).not.toHaveBeenCalled()
+
+        comp.setProps(
+          <TransitionContext transitionState="in">
+            <TransitionContext transitionState="in">
+              <div />
+            </TransitionContext>
+          </TransitionContext>
+        )
+
+        expect(onTransition).toHaveBeenCalledWith('in', 'out')
+        expect(didLeave).toHaveBeenCalled()
+      })
+      it('fires didLeave when parent unmounts', () => {
+        const onTransition = jasmine.createSpy('onTransition')
+        const didLeave = jasmine.createSpy('didLeave')
+
+        const comp = mount(
+          <TransitionContext transitionState="in">
+            <TransitionContext transitionState="in">
+              <TransitionListener onTransition={onTransition} didLeave={didLeave} />
+            </TransitionContext>
+          </TransitionContext>
+        )
+
+        expect(onTransition).not.toHaveBeenCalled()
+        expect(didLeave).not.toHaveBeenCalled()
+
+        comp.setProps({children: null})
+
+        expect(onTransition).toHaveBeenCalledWith('in', 'out')
+        expect(didLeave).toHaveBeenCalled()
+      })
     })
   })
 })

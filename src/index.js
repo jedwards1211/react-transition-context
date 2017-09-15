@@ -88,7 +88,7 @@ export default class TransitionContext extends Component<void, Props, void> {
     (prevState, nextState) => {
       if (nextState !== prevState) {
         for (let listener of this.listeners) {
-          if (listener.onTransition instanceof Function) {
+          if (prevState && listener.onTransition instanceof Function) {
             listener.onTransition(prevState, nextState)
           }
         }
@@ -131,6 +131,7 @@ export default class TransitionContext extends Component<void, Props, void> {
     };
 
   componentWillMount() {
+    this.prevState = this.transitionContext.getState()
     let {transitionContext} = this.context
     if (transitionContext) {
       // flow workaround
@@ -163,12 +164,14 @@ export default class TransitionContext extends Component<void, Props, void> {
   }
 
   componentWillUnmount() {
+    const {prevState} = this
     let {transitionContext} = this.context
     if (transitionContext) {
       // flow workaround
       const listener: Object = this
       transitionContext.removeListener(listener)
     }
+    this.handleTransition(prevState, 'out')
   }
 
   onTransition: (prevState: TransitionState, nextState: TransitionState) => void = (prevState, nextState) => {
@@ -231,8 +234,12 @@ export class TransitionListener extends Component<void, Listener, void> {
       // flow workaround
       const listener: Object = this
       transitionContext.removeListener(listener)
+      if (transitionContext.getState() !== 'out') {
+        this.didLeave && this.didLeave()
+      }
     } else {
       this.willLeave && this.willLeave()
+      this.didLeave && this.didLeave()
     }
   }
 
