@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, {Component} from 'react'
+import * as React from 'react'
 import PropTypes from 'prop-types'
 
 type TransitionState = 'out' | 'in' | 'appearing' | 'entering' | 'leaving'
@@ -10,7 +10,7 @@ type TransitionContextMethods = {
   getState: () => TransitionState,
 }
 type Context = {
-  transitionContext: TransitionContextMethods
+  transitionContext: TransitionContextMethods,
 }
 
 type Listener = {
@@ -38,7 +38,7 @@ type Props = {
   children: any,
 }
 
-export default class TransitionContext extends Component<void, Props, void> {
+export default class TransitionContext extends React.Component<Props, void> {
   static propTypes = {
     transitionState: PropTypes.oneOf(['out', 'in', 'appearing', 'entering', 'leaving']),
     children: PropTypes.any
@@ -61,10 +61,10 @@ export default class TransitionContext extends Component<void, Props, void> {
   listeners: Array<Listener> = [];
 
   transitionContext: TransitionContextMethods = {
-    addListener: listener => {
+    addListener: (listener: Listener) => {
       this.listeners.push(listener)
     },
-    removeListener: listener => {
+    removeListener: (listener: Listener) => {
       this.listeners.splice(this.listeners.indexOf(listener), 1)
     },
     getState: () => {
@@ -75,7 +75,7 @@ export default class TransitionContext extends Component<void, Props, void> {
     }
   };
 
-  callListeners: (event: string) => void = (event) => {
+  callListeners = (event: string) => {
     for (let listener of this.listeners) {
       if (listener[event] instanceof Function) {
         listener[event]()
@@ -83,52 +83,50 @@ export default class TransitionContext extends Component<void, Props, void> {
     }
   };
 
-  handleTransition: (prevState: TransitionState,
-                     nextState: TransitionState) => void =
-    (prevState, nextState) => {
-      if (nextState !== prevState) {
-        for (let listener of this.listeners) {
-          if (prevState && listener.onTransition instanceof Function) {
-            listener.onTransition(prevState, nextState)
-          }
-        }
-
-        switch (nextState) {
-        case 'out':
-          if (prevState === 'leaving') {
-            this.callListeners('didLeave')
-          }
-          break
-        case 'in':
-          if (prevState === 'appearing') {
-            this.callListeners('didAppear')
-            this.callListeners('didComeIn')
-          }
-          else if (prevState === 'entering') {
-            this.callListeners('didEnter')
-            this.callListeners('didComeIn')
-          }
-          break
-        case 'appearing':
-          if (prevState === 'out' || prevState === 'leaving') {
-            this.callListeners('willAppear')
-            this.callListeners('willComeIn')
-          }
-          break
-        case 'entering':
-          if (prevState === 'out' || prevState === 'leaving') {
-            this.callListeners('willEnter')
-            this.callListeners('willComeIn')
-          }
-          break
-        case 'leaving':
-          if (prevState === 'in' || prevState === 'appearing' || prevState === 'entering') {
-            this.callListeners('willLeave')
-          }
-          break
+  handleTransition = (prevState: TransitionState, nextState: TransitionState) => {
+    if (nextState !== prevState) {
+      for (let listener of this.listeners) {
+        if (prevState && listener.onTransition instanceof Function) {
+          listener.onTransition(prevState, nextState)
         }
       }
-    };
+
+      switch (nextState) {
+      case 'out':
+        if (prevState === 'leaving') {
+          this.callListeners('didLeave')
+        }
+        break
+      case 'in':
+        if (prevState === 'appearing') {
+          this.callListeners('didAppear')
+          this.callListeners('didComeIn')
+        }
+        else if (prevState === 'entering') {
+          this.callListeners('didEnter')
+          this.callListeners('didComeIn')
+        }
+        break
+      case 'appearing':
+        if (prevState === 'out' || prevState === 'leaving') {
+          this.callListeners('willAppear')
+          this.callListeners('willComeIn')
+        }
+        break
+      case 'entering':
+        if (prevState === 'out' || prevState === 'leaving') {
+          this.callListeners('willEnter')
+          this.callListeners('willComeIn')
+        }
+        break
+      case 'leaving':
+        if (prevState === 'in' || prevState === 'appearing' || prevState === 'entering') {
+          this.callListeners('willLeave')
+        }
+        break
+      }
+    }
+  };
 
   componentWillMount() {
     this.prevState = this.transitionContext.getState()
@@ -174,19 +172,19 @@ export default class TransitionContext extends Component<void, Props, void> {
     this.handleTransition(prevState, 'out')
   }
 
-  onTransition: (prevState: TransitionState, nextState: TransitionState) => void = (prevState, nextState) => {
+  onTransition = (prevState: TransitionState, nextState: TransitionState) => {
     const {transitionState} = this.props
     this.handleTransition(
       overallTransitionState(prevState, transitionState),
       overallTransitionState(nextState, transitionState))
   };
 
-  render() {
+  render(): ?React.Node {
     return this.props.children
   }
 }
 
-export class TransitionListener extends Component<void, Listener, void> {
+export class TransitionListener extends React.Component<Listener, void> {
   static contextTypes = {
     transitionContext: PropTypes.object
   };
@@ -243,7 +241,7 @@ export class TransitionListener extends Component<void, Listener, void> {
     }
   }
 
-  updateEvents: (props?: Listener) => void = (props = this.props) => {
+  updateEvents = (props: Listener = this.props) => {
     this.onTransition = props.onTransition
     this.willComeIn = props.willComeIn
     this.didComeIn = props.didComeIn
@@ -255,7 +253,7 @@ export class TransitionListener extends Component<void, Listener, void> {
     this.didLeave = props.didLeave
   };
 
-  render() {
+  render(): ?React.Node {
     return null
   }
 }
