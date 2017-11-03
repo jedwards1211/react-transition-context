@@ -38,7 +38,8 @@ type Props = {
   children: any,
 }
 
-export default class TransitionContext extends React.Component<Props, void> {
+export default class TransitionContext extends React.Component<Props> {
+  static defaultProps: Props;
   static propTypes = {
     transitionState: PropTypes.oneOf(['out', 'in', 'appearing', 'entering', 'leaving']),
     children: PropTypes.any
@@ -184,7 +185,8 @@ export default class TransitionContext extends React.Component<Props, void> {
   }
 }
 
-export class TransitionListener extends React.Component<Listener, void> {
+export class TransitionListener extends React.Component<Listener> {
+  static defaultProps: Listener;
   static contextTypes = {
     transitionContext: PropTypes.object
   };

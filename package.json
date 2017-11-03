@@ -1,6 +1,6 @@
 {
   "name": "react-transition-context",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "listen for entering/leaving inside nested transitions",
   "main": "lib/index.js",
   "scripts": {
@@ -43,7 +43,7 @@
     "eslint": "^3.11.1",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-react": "^6.8.0",
-    "flow-bin": "^0.45.0",
+    "flow-bin": "^0.56.0",
     "jasmine": "^2.4.1",
     "karma": "^1.3.0",
     "karma-chrome-launcher": "^2.0.0",
