@@ -235,6 +235,8 @@ export class TransitionListener extends React.Component<Listener> {
       const listener: Object = this
       transitionContext.removeListener(listener)
       if (transitionContext.getState() !== 'out') {
+        const {onTransition} = this
+        onTransition && onTransition(transitionContext.getState(), 'out')
         this.didLeave && this.didLeave()
       }
     } else {

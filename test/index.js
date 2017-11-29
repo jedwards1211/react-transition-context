@@ -2,6 +2,9 @@ import React from 'react'
 import TransitionContext, {TransitionListener} from '../src'
 
 import {mount} from 'enzyme'
+import {configure} from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
+configure({ adapter: new Adapter() })
 
 describe('TransitionListener', () => {
   describe('by itself', () => {
@@ -271,7 +274,7 @@ describe('TransitionContext', () => {
             <TransitionContext transitionState="in">
               <div />
             </TransitionContext>
-          </TransitionContext>
+          </TransitionContext>.props
         )
 
         expect(onTransition).toHaveBeenCalledWith('in', 'out')
