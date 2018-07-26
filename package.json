@@ -1,6 +1,6 @@
 {
   "name": "react-transition-context",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "listen for entering/leaving inside nested transitions",
   "main": "lib/index.js",
   "scripts": {
