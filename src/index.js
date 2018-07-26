@@ -185,10 +185,17 @@ export default class TransitionContext extends React.Component<Props> {
   }
 }
 
-export class TransitionListener extends React.Component<Listener> {
+type ListenerProps = Listener & {
+  children?: ({transitionState: TransitionState}) => ?React.Node,
+}
+
+export class TransitionListener extends React.Component<ListenerProps> {
   static defaultProps: Listener;
   static contextTypes = {
     transitionContext: PropTypes.object
+  };
+  static propTypes = {
+    children: PropTypes.func
   };
 
   onTransition: ?(prevState: TransitionState, nextState: TransitionState) => any;
@@ -201,6 +208,10 @@ export class TransitionListener extends React.Component<Listener> {
   willLeave: ?Function;
   didLeave: ?Function;
 
+  renderListener: Listener = {
+    onTransition: () => this.forceUpdate()
+  }
+
   componentWillMount() {
     const {transitionContext} = this.context
     this.updateEvents()
@@ -208,6 +219,7 @@ export class TransitionListener extends React.Component<Listener> {
       // flow workaround
       const listener: Object = this
       transitionContext.addListener(listener)
+      transitionContext.addListener(this.renderListener)
     }
   }
 
@@ -223,8 +235,14 @@ export class TransitionListener extends React.Component<Listener> {
     if (prevTransitionContext !== nextTransitionContext) {
       // flow workaround
       const listener: Object = this
-      if (prevTransitionContext != null) prevTransitionContext.removeListener(listener)
-      if (nextTransitionContext != null) nextTransitionContext.addListener(listener)
+      if (prevTransitionContext != null) {
+        prevTransitionContext.removeListener(listener)
+        prevTransitionContext.removeListener(this.renderListener)
+      }
+      if (nextTransitionContext != null) {
+        nextTransitionContext.addListener(listener)
+        nextTransitionContext.addListener(this.renderListener)
+      }
     }
     this.updateEvents(nextProps)
   }
@@ -234,6 +252,7 @@ export class TransitionListener extends React.Component<Listener> {
       // flow workaround
       const listener: Object = this
       transitionContext.removeListener(listener)
+      transitionContext.removeListener(this.renderListener)
       if (transitionContext.getState() !== 'out') {
         const {onTransition} = this
         onTransition && onTransition(transitionContext.getState(), 'out')
@@ -258,6 +277,9 @@ export class TransitionListener extends React.Component<Listener> {
   };
 
   render(): ?React.Node {
+    const {children} = this.props
+    const {transitionContext} = this.context
+    if (children) return children({transitionState: transitionContext.getState()})
     return null
   }
 }

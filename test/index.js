@@ -202,6 +202,37 @@ describe('TransitionContext', () => {
         expect(onTransition).toHaveBeenCalledWith('entering', 'in')
         expect(didEnter).toHaveBeenCalled()
       })
+      it('rerenders when parent enters', () => {
+        const onTransition = jasmine.createSpy('onTransition')
+        const props = {children: () => null}
+        const children = spyOn(props, 'children').and.callThrough()
+
+        const comp = mount(
+          <TransitionContext transitionState="entering">
+            <TransitionContext transitionState="in">
+              <TransitionListener onTransition={onTransition}>
+                {children}
+              </TransitionListener>
+            </TransitionContext>
+          </TransitionContext>
+        )
+
+        expect(onTransition).not.toHaveBeenCalled()
+
+        comp.setProps(
+          <TransitionContext transitionState="in">
+            <TransitionContext transitionState="in">
+              <TransitionListener onTransition={onTransition}>
+                {children}
+              </TransitionListener>
+            </TransitionContext>
+          </TransitionContext>.props
+        )
+
+        expect(onTransition).toHaveBeenCalledWith('entering', 'in')
+        expect(children).toHaveBeenCalledWith({transitionState: 'entering'})
+        expect(children).toHaveBeenCalledWith({transitionState: 'in'})
+      })
       it('fires willLeave when parent will leave', () => {
         const onTransition = jasmine.createSpy('onTransition')
         const willLeave = jasmine.createSpy('willLeave')
