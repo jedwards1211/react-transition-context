@@ -58,6 +58,7 @@ export default class TransitionContext extends React.Component<Props> {
   }
 
   context: Context;
+  prevContext: Context;
   prevState: TransitionState;
   listeners: Array<Listener> = [];
 
@@ -129,36 +130,31 @@ export default class TransitionContext extends React.Component<Props> {
     }
   };
 
-  componentWillMount() {
+  componentDidMount() {
     this.prevState = this.transitionContext.getState()
+    this.prevContext = this.context
     let {transitionContext} = this.context
     if (transitionContext) {
       // flow workaround
       const listener: Object = this
       transitionContext.addListener(listener)
     }
-  }
-
-  componentDidMount() {
     if (this.transitionContext.getState() === 'in') this.callListeners('didComeIn')
   }
 
-  componentWillReceiveProps(nextProps: Props, nextContext: any) {
-    const prevTransitionContext = this.context.transitionContext
-    const nextTransitionContext = nextContext.transitionContext
+  componentDidUpdate() {
+    const prevTransitionContext = this.prevContext.transitionContext
+    const nextTransitionContext = this.context.transitionContext
+    this.prevContext = this.context
     if (prevTransitionContext !== nextTransitionContext) {
       // flow workaround
       const listener: Object = this
       if (prevTransitionContext != null) prevTransitionContext.removeListener(listener)
       if (nextTransitionContext != null) nextTransitionContext.addListener(listener)
     }
-
-    this.prevState = this.transitionContext.getState()
-  }
-
-  componentDidUpdate() {
     const {prevState, transitionContext} = this
     const nextState = transitionContext.getState()
+    this.prevState = nextState
     this.handleTransition(prevState, nextState)
   }
 
@@ -198,6 +194,8 @@ export class TransitionListener extends React.Component<ListenerProps> {
     children: PropTypes.func
   };
 
+  prevContext: any
+
   onTransition: ?(prevState: TransitionState, nextState: TransitionState) => any;
   willComeIn: ?Function;
   didComeIn: ?Function;
@@ -212,8 +210,9 @@ export class TransitionListener extends React.Component<ListenerProps> {
     onTransition: () => this.forceUpdate()
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const {transitionContext} = this.context
+    this.prevContext = this.context
     this.updateEvents()
     if (transitionContext) {
       // flow workaround
@@ -221,17 +220,14 @@ export class TransitionListener extends React.Component<ListenerProps> {
       transitionContext.addListener(listener)
       transitionContext.addListener(this.renderListener)
     }
-  }
-
-  componentDidMount() {
-    const {transitionContext} = this.context
     if (!transitionContext || transitionContext.getState() === 'in') {
       this.didComeIn && this.didComeIn()
     }
   }
-  componentWillReceiveProps(nextProps: Listener, nextContext: any) {
-    const prevTransitionContext = this.context.transitionContext
-    const nextTransitionContext = nextContext.transitionContext
+  componentDidUpdate(prevProps: Listener) {
+    const prevTransitionContext = this.prevContext.transitionContext
+    const nextTransitionContext = this.context.transitionContext
+    this.prevContext = this.context
     if (prevTransitionContext !== nextTransitionContext) {
       // flow workaround
       const listener: Object = this
@@ -244,7 +240,7 @@ export class TransitionListener extends React.Component<ListenerProps> {
         nextTransitionContext.addListener(this.renderListener)
       }
     }
-    this.updateEvents(nextProps)
+    this.updateEvents(this.props)
   }
   componentWillUnmount() {
     const {transitionContext} = this.context
